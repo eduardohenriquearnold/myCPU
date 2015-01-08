@@ -11,7 +11,7 @@ module adder #(parameter len)
 
         logic [len:0] carry;
         assign carry[0] = cin;
-        assign cout = (~a[len-1])&(~b[len-1])&r[len-1] | a[len-1]&b[len-1]&(~r[len-1]);
+        assign cout = carry[len];
 
         generate
                 genvar i;
@@ -42,19 +42,19 @@ module ALU #(parameter wordLen)
                 overflow = 0;
                 
                 case(op) 
-                        //ADD
+                        //ADD signed
                         4'b0010: begin
                                         inBadder = B;
                                         cin = 0;
                                         res = outAdder; 
-                                        overflow = cout;                                
+                                        overflow = (~A[wordLen-1])&(~B[wordLen-1])&outAdder[wordLen-1] | A[wordLen-1]&B[wordLen-1]&(~outAdder[wordLen-1]);
                                  end
-                        //SUB         
+                        //SUB signed     
                         4'b0110: begin
                                         inBadder = ~B;
                                         cin = 1;
                                         res = outAdder;
-                                        overflow = cout;                                 
+                                        overflow = (~A[wordLen-1])&(~B[wordLen-1])&outAdder[wordLen-1] | A[wordLen-1]&B[wordLen-1]&(~outAdder[wordLen-1]);                              
                                  end
                         //SLT
                         4'b0111: begin
