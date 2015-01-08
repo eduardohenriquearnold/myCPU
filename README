@@ -1,0 +1,6 @@
+MIPS32 based Processor
+======================
+
+Creating a basic processor seems to be a very good way of practicing Digital Design, Computer Architecture and at the same time learning more about System Verilog. 
+
+The implementation will consist in a multicycle instruction design and with a reduced instruction set based on MIPS I.
