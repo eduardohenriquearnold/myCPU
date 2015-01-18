@@ -54,7 +54,7 @@ module ALU #(parameter wordLen)
                                         inBadder = ~B;
                                         cin = 1;
                                         res = outAdder;
-                                        overflow = (~A[wordLen-1])&(~B[wordLen-1])&outAdder[wordLen-1] | A[wordLen-1]&B[wordLen-1]&(~outAdder[wordLen-1]);                              
+                                        overflow = (A[wordLen-1])&(~B[wordLen-1])&outAdder[wordLen-1] | (~A[wordLen-1])&B[wordLen-1]&outAdder[wordLen-1];                              
                                  end
                         //SLT
                         4'b0111: begin
