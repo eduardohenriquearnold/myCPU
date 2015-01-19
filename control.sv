@@ -1,6 +1,6 @@
 module control(
         input logic clk, reset,
-        input logic [5:0] inst,
+        input logic [31:0] inst,
         input logic aluzero,
         
         output logic wpc, wins,
@@ -8,6 +8,11 @@ module control(
         output logic selext, selalu1, output logic [2:0] selalu2, output logic [3:0] aluop,
         output logic selregwd, selregaddr, wreg
 );
+
+        //Define opcode and funct from instuction
+        logic [5:0] opcode, funct;
+        assign opcode = inst[31:26];
+        assign funct = inst[5:0];
 
         //States
         enum {FETCH, DECODE, MRTYPE, MALUIMM, LW, SW, BENEQ, J, JR, BPCINC, REGPCINC} state, next;
@@ -25,9 +30,10 @@ module control(
                 unique case(state)
                         FETCH: next = DECODE;
                         
-                        DECODE: unique case(inst)
-                                     //Mainstream R-Type: add, sub, slt, or, and , nor
-                                     6'b100000, 6'b100010, 6'b101010, 6'b100101, 6'b100100, 6'b100111: next = MRTYPE;
+                        DECODE: begin
+                                unique case(opcode)
+                                     //Mainstream R-Type (have op=0): add, sub, slt, or, and , nor 
+                                     6'b000000: next = MRTYPE;
                                      
                                      //Mainstream ALU immediate: addi, andi, ori
                                      6'b001000, 6'b001100, 6'b001101: next = MALUIMM;
@@ -42,11 +48,12 @@ module control(
                                      6'b000100, 6'b000101: next = BENEQ;
                                      
                                      //J
-                                     6'b000010: next = J;
-                                     
-                                     //JR
-                                     6'b001000: next = JR;
+                                     6'b000010: next = J;                                     
                                 endcase
+                                //JR is RType with funct b001000 
+                                if (funct == 6'b001000)
+                                     next = JR;
+                                end
                                 
                         MRTYPE, MALUIMM, LW, SW: next = REGPCINC;
                         
@@ -86,7 +93,7 @@ module control(
                                         selregaddr=0;
                                         wreg=1'b1;
                                         
-                                        unique case(inst)
+                                        unique case(funct)
                                          //add
                                          6'b100000: aluop= 4'b0010;
                                          //sub
